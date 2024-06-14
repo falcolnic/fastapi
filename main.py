@@ -3,6 +3,7 @@ from auth import *
 from fastapi import FastAPI, APIRouter
 
 
+
 @asynccontextmanager
 async def get_app():
     app = FastAPI()

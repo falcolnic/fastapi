@@ -7,6 +7,8 @@ app = FastAPI()
 router = APIRouter()
 
 
+
+
 class User(BaseModel):
     username: str
     mail: str
