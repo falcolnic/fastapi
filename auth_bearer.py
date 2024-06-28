@@ -5,7 +5,7 @@ from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from models import TokenTable
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 30 minutes
+ACCESS_TOKEN_EXPIRE_MINUTES = 15  # 15 minutes
 REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days
 ALGORITHM = "HS256"
 JWT_SECRET_KEY = "narscbjim@$@&^@&%^&RFghgjvbdsha"   # should be kept secret

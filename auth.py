@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import schemas
 import models
 from models import TokenTable, User
@@ -9,11 +9,12 @@ import jwt
 from auth_bearer import JWTBearer
 from utils import create_access_token,create_refresh_token,verify_password,get_hashed_password
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 30 minutes
-REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days
-ALGORITHM = "HS256"
-JWT_SECRET_KEY = "narscbjim@$@&^@&%^&RFghgjvbdsha"   # should be kept secret
-JWT_REFRESH_SECRET_KEY = "13ugfdfgh@#$%^@&jkl45678902"
+
+#ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 30 minutes
+#REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days
+#ALGORITHM = "HS256"
+#JWT_SECRET_KEY = "narscbjim@$@&^@&%^&RFghgjvbdsha"   # should be kept secret
+#JWT_REFRESH_SECRET_KEY = "13ugfdfgh@#$%^@&jkl45678902"
 
 
 
@@ -37,9 +38,7 @@ def register_user(user: schemas.UserCreate, session: Session = Depends(get_sessi
         raise HTTPException(status_code=400, detail="Email already registered")
 
     encrypted_password =get_hashed_password(user.password)
-
     new_user = models.User(username=user.username, email=user.email, password=encrypted_password )
-
     session.add(new_user)
     session.commit()
     session.refresh(new_user)
@@ -58,7 +57,7 @@ def login(request: schemas.requestdetails, db: Session = Depends(get_session)):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect password"
         )
-    
+        
     access=create_access_token(user.id)
     refresh = create_refresh_token(user.id)
 
@@ -73,7 +72,7 @@ def login(request: schemas.requestdetails, db: Session = Depends(get_session)):
     
     
 @router.get('/getusers')
-def getusers(dependencies=Depends(JWTBearer()),session: Session = Depends(get_session)):
+def getusers(dependencies=Depends(JWTBearer()), session: Session = Depends(get_session)):
     user = session.query(models.User).all()
     return user
 
