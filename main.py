@@ -1,16 +1,17 @@
 from fastapi import FastAPI, APIRouter
-from auth import router as auth_router
+
+from login import router as login_router
+from registration import router as registration_router
+from logout import router as logout_router
 from otp import router as otp_router
-from database import SessionLocal, engine
-from sqlalchemy.orm import Session
+
 from contextlib import asynccontextmanager
 
 
 
-router = APIRouter()
-
-
-
 app = FastAPI()
-app.include_router(auth_router)
+app.include_router(login_router)
+app.include_router(registration_router)
+app.include_router(logout_router)
+
 app.include_router(otp_router)
