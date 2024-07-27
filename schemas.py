@@ -11,7 +11,6 @@ class UserCreate(BaseModel):
     username: Annotated[str, MinLen(4), MaxLen(40)]
     email: Annotated[EmailStr, MinLen(5), MaxLen(40)]
     password: Annotated[str, Form()]
-    is_verified: bool=False
     
 class UserLogin(BaseModel):
     email: str
