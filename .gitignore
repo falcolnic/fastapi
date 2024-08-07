@@ -3,6 +3,7 @@ venv
 .env
 alembic
 alembic.ini
+alembic_backup
 
 ### Python ###
 __pycache__/

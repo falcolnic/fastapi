@@ -2,7 +2,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-DATABASE_URL = "postgresql://postgres:Mishayanoshi18@localhost:5432/fastapi_db"
+import os
+from dotenv import load_dotenv
+load_dotenv('.env')
+class Envs:
+    DB_URL = os.getenv('DB_URL')
+    
+DATABASE_URL = Envs.DB_URL
 
 engine = create_engine(DATABASE_URL)
 
