@@ -1,5 +1,4 @@
 from datetime import datetime
-import random
 import schemas
 import models
 from models import TokenTable, User
@@ -8,11 +7,7 @@ from sqlalchemy.orm import Session
 from fastapi import FastAPI, Depends, HTTPException, status, APIRouter
 import jwt
 from auth_bearer import ALGORITHM, JWT_SECRET_KEY, JWTBearer
-from utils import create_access_token,create_refresh_token,verify_password,get_hashed_password
-from starlette.responses import JSONResponse
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
-from pydantic import EmailStr, BaseModel
-from typing import List
+from utils import verify_password,get_hashed_password
 
 
 

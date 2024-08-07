@@ -1,22 +1,17 @@
-from datetime import datetime
-import random
+from datetime import datetime, timedelta
 import schemas
 import models
-from models import TokenTable, User
 from database import Base, engine, SessionLocal
 from sqlalchemy.orm import Session
 from fastapi import FastAPI, Depends, HTTPException, Request, status, APIRouter
-
-from auth_bearer import JWTBearer
-from utils import create_access_token,create_refresh_token,verify_password,get_hashed_password
-from starlette.responses import JSONResponse
+from utils import get_hashed_password
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
-from pydantic import EmailStr, BaseModel
-from typing import List
+from otp import generate_OTP
 
 import os
 from dotenv import load_dotenv
 load_dotenv('.env')
+
 
 class Envs:
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
@@ -50,31 +45,41 @@ def get_session():
         session.close()
         
         
-router=APIRouter()
+router=APIRouter(
+    prefix='/auth',
+    tags=['auth-in']
+)
 
 
 #Working
 @router.post("/register")
 async def register_user(user: schemas.UserCreate, session: Session = Depends(get_session)):
     existing_user = session.query(models.User).filter_by(email=user.email).first()
-    if existing_user != None:
-        raise HTTPException(
-            detail='Email is already registered',
-            status_code= status.HTTP_409_CONFLICT
-        )
-
-    html = """<p>Hi this test mail, thanks for using Fastapi-mail</p> """
+    
+    if existing_user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
+    
+    encrypted_password = get_hashed_password(user.password)
+    user.password = encrypted_password
+    
+    otp = generate_OTP()
+    otp_expiry = datetime.now() + timedelta(minutes=5)
+    
+    new_user = models.User(
+        username=user.username,
+        email=user.email,
+        password=encrypted_password,
+        otp=otp,
+        otp_expiry=otp_expiry
+    )
+    
+    html = f"<p>Thank you for choosing us, here is your OTP Code: {otp} for this Username: {user.username}</p>"
     message = MessageSchema(
             subject="Verification Code",
             recipients=[user.email],
             body=html,
             subtype=MessageType.html)
     fm = FastMail(conf)
-
-
-    encrypted_password = get_hashed_password(user.password)
-    user.password = encrypted_password
-    new_user = models.User(username=user.username, email=user.email, password=encrypted_password )
     
     session.add(new_user)
     session.commit()

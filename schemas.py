@@ -4,23 +4,21 @@ from annotated_types import MinLen, MaxLen
 from fastapi import Depends, Form, Query
 from pydantic import BaseModel, EmailStr, ConfigDict
 
-
 class UserCreate(BaseModel):
     model_config = ConfigDict(strict=True)
     
-    username: Annotated[str, MinLen(4), MaxLen(40)]
+    username: Annotated[str, MinLen(3), MaxLen(40)]
     email: Annotated[EmailStr, MinLen(5), MaxLen(40)]
     password: Annotated[str, Form()]
     
 class UserLogin(BaseModel):
     email: str
     password: str
-        
+    otp: str
         
 class TokenSchema(BaseModel):
     access_token: str
     refresh_token: str
-
 
 class changepassword(BaseModel):
     email:str

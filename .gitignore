@@ -1,7 +1,8 @@
 venv
 .idea
 .env
-
+alembic
+alembic.ini
 
 ### Python ###
 __pycache__/
