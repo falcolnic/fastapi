@@ -1,12 +1,13 @@
-import schemas
-import models
+from src import schemas
+from src import models
+from src.database import Base, engine, SessionLocal
+
 from datetime import datetime
-from models import TokenTable, User
-from database import Base, engine, SessionLocal
+from src.models import TokenTable, User
 from sqlalchemy.orm import Session
 from fastapi import FastAPI, Depends, HTTPException, status, APIRouter
-from auth_bearer import JWTBearer
-from utils import create_access_token,create_refresh_token,verify_password,get_hashed_password
+from src.auth_bearer import JWTBearer
+from src.utils import create_access_token,create_refresh_token,verify_password,get_hashed_password
 
 
 Base.metadata.create_all(engine)

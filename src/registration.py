@@ -1,13 +1,15 @@
+# Package
 from datetime import datetime, timedelta
-import schemas
-import models
-from database import Base, engine, SessionLocal
 from sqlalchemy.orm import Session
 from fastapi import FastAPI, Depends, HTTPException, Request, status, APIRouter
-from utils import get_hashed_password
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
-from otp import generate_OTP
-
+# Local
+import src.schemas as schemas
+import src.models as models
+from src.database import Base, engine, SessionLocal
+from src.utils import get_hashed_password
+from src.otp import generate_OTP
+# Env
 import os
 from dotenv import load_dotenv
 load_dotenv('.env')
@@ -86,6 +88,6 @@ async def register_user(user: schemas.UserCreate, session: Session = Depends(get
     session.refresh(new_user)
     
     await fm.send_message(message)
-    return {"message":"user and mail successfully"}
+    return {"message":"user and mail successfully registred"}
 
 

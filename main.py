@@ -1,16 +1,15 @@
 from fastapi import FastAPI, APIRouter
-from login import router as login_router
-from registration import router as registration_router
-from logout import router as logout_router
 import uvicorn
 from contextlib import asynccontextmanager
 
+from src.login import router as login_router
+from src.registration import router as registration_router
+from src.logout import router as logout_router
 
 app = FastAPI()
 app.include_router(login_router)
 app.include_router(registration_router)
 app.include_router(logout_router)
-
 
      
 if __name__ == "__main__":
