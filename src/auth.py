@@ -1,13 +1,13 @@
 # Package
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from fastapi import FastAPI, Depends, HTTPException, Request, status, APIRouter
+from fastapi import Depends, HTTPException, status, APIRouter
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 # Local
 import src.schemas as schemas
 import src.models as models
 from src.database import Base, engine, SessionLocal
-from src.utils import get_hashed_password
+from src.utils import create_access_token,create_refresh_token,verify_password,get_hashed_password
 from src.otp import generate_OTP
 
 # Env
@@ -49,15 +49,14 @@ def get_session():
         
 router=APIRouter(
     prefix='/auth',
-    tags=['auth-in']
+    tags=['auth']
 )
 
 
 #Working
 @router.post("/register")
 async def register_user(user: schemas.UserCreate, session: Session = Depends(get_session)):
-    existing_user = session.query(models.User).filter_by(email=user.email).first()
-    
+    existing_user = session.query(models.User).filter_by(email=user.email.lower()).first()
     if existing_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
     
@@ -69,7 +68,7 @@ async def register_user(user: schemas.UserCreate, session: Session = Depends(get
     
     new_user = models.User(
         username=user.username,
-        email=user.email,
+        email=user.email.lower(),
         password=encrypted_password,
         otp=otp,
         otp_expiry=otp_expiry
@@ -88,6 +87,44 @@ async def register_user(user: schemas.UserCreate, session: Session = Depends(get
     session.refresh(new_user)
     
     await fm.send_message(message)
-    return {"message":"user and mail successfully registred"}
+    return {"message":"Registration successful, check your email for OTP code for login"}
 
 
+@router.post('/login', response_model=schemas.TokenSchema)
+def login(request: schemas.UserLogin, session: Session = Depends(get_session)):
+    user = session.query(models.User).filter(models.User.email.lower() == request.email.lower()).first()
+    
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect email")
+    
+    hashed_pass = user.password
+    
+    if not verify_password(request.password, hashed_pass):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect password"
+        )
+        
+    # Verify OTP
+    if request.otp != user.otp or datetime.utcnow() > user.otp_expiry:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired OTP"
+        )
+        
+    # Generate tokens
+    access=create_access_token(user.id)
+    refresh = create_refresh_token(user.id)
+
+    token_db = models.TokenTable(user_id=user.id,  access_toke=access,  refresh_toke=refresh, status=True)
+    
+    session.add(token_db)
+    session.commit()
+    session.refresh(token_db)
+   
+   
+    return {
+        "access_token": access,
+        "refresh_token": refresh,
+    }
+    

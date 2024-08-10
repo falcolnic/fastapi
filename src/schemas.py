@@ -4,6 +4,13 @@ from annotated_types import MinLen, MaxLen
 from fastapi import Depends, Form
 from pydantic import BaseModel, EmailStr, ConfigDict
 
+
+class User(BaseModel):
+    id: str
+    email: str
+    password: str
+    
+    
 class UserCreate(BaseModel):
     model_config = ConfigDict(strict=True)
     
