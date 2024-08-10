@@ -1,7 +1,7 @@
 import datetime
 from typing import Annotated
 from annotated_types import MinLen, MaxLen
-from fastapi import Depends, Form, Query
+from fastapi import Depends, Form
 from pydantic import BaseModel, EmailStr, ConfigDict
 
 class UserCreate(BaseModel):

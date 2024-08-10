@@ -1,14 +1,23 @@
+# Packages
 import jwt
 from jwt.exceptions import InvalidTokenError
-from fastapi import FastAPI, Depends, HTTPException,status
-from fastapi import Request, HTTPException
+from fastapi import  HTTPException, Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
+# conf
+import os
+from dotenv import load_dotenv
+load_dotenv('.env')
+class Envs:
+    SECRET_KEY = os.getenv('SECRET_KEY')
+    ALGO = os.getenv('ALGO')
+    REFRESH_SECRET = os.getenv('REFRESH_SECRET')
+    
 ACCESS_TOKEN_EXPIRE_MINUTES = 15  # 15 minutes
-REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days
-ALGORITHM = "HS256"
-JWT_SECRET_KEY = "narscbjim@$@&^@&%^&RFghgjvbdsha"   # should be kept secret
-JWT_REFRESH_SECRET_KEY = "13ugfdfgh@#$%^@&jkl45678902"
+REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 # 1 days
+ALGORITHM = Envs.ALGO
+JWT_SECRET_KEY = Envs.SECRET_KEY # changed the secret key
+JWT_REFRESH_SECRET_KEY = Envs.REFRESH_SECRET
 
 def decodeJWT(jwtoken: str):
     try:

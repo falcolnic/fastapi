@@ -9,11 +9,11 @@ import src.models as models
 from src.database import Base, engine, SessionLocal
 from src.utils import get_hashed_password
 from src.otp import generate_OTP
+
 # Env
 import os
 from dotenv import load_dotenv
 load_dotenv('.env')
-
 
 class Envs:
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
