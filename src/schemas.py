@@ -3,13 +3,12 @@ from typing import Annotated
 from annotated_types import MinLen, MaxLen
 from fastapi import Depends, Form
 from pydantic import BaseModel, EmailStr, ConfigDict
-
+from typing import Optional
 
 class User(BaseModel):
-    id: str
     email: str
     password: str
-    
+    provider: Optional[str]
     
 class UserCreate(BaseModel):
     model_config = ConfigDict(strict=True)

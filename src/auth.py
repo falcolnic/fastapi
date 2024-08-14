@@ -3,10 +3,11 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException, status, APIRouter
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
+from sqlalchemy import func
 # Local
 import src.schemas as schemas
 import src.models as models
-from src.database import Base, engine, SessionLocal
+from src.database import Base, engine, SessionLocal, get_db
 from src.utils import create_access_token,create_refresh_token,verify_password,get_hashed_password
 from src.otp import generate_OTP
 
@@ -37,14 +38,6 @@ conf = ConnectionConfig(
     VALIDATE_CERTS=True
 )
 
-
-Base.metadata.create_all(engine)
-def get_session():
-    session = SessionLocal()
-    try:
-        yield session
-    finally:
-        session.close()
         
         
 router=APIRouter(
@@ -55,8 +48,8 @@ router=APIRouter(
 
 #Working
 @router.post("/register")
-async def register_user(user: schemas.UserCreate, session: Session = Depends(get_session)):
-    existing_user = session.query(models.User).filter_by(email=user.email.lower()).first()
+async def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    existing_user = db.query(models.User).filter_by(email=user.email.lower()).first()
     if existing_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
     
@@ -82,17 +75,17 @@ async def register_user(user: schemas.UserCreate, session: Session = Depends(get
             subtype=MessageType.html)
     fm = FastMail(conf)
     
-    session.add(new_user)
-    session.commit()
-    session.refresh(new_user)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
     
     await fm.send_message(message)
     return {"message":"Registration successful, check your email for OTP code for login"}
 
 
 @router.post('/login', response_model=schemas.TokenSchema)
-def login(request: schemas.UserLogin, session: Session = Depends(get_session)):
-    user = session.query(models.User).filter(models.User.email.lower() == request.email.lower()).first()
+def login(request: schemas.UserLogin, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(func.lower(models.User.email) == request.email.lower()).first()
     
     if user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect email")
@@ -118,9 +111,9 @@ def login(request: schemas.UserLogin, session: Session = Depends(get_session)):
 
     token_db = models.TokenTable(user_id=user.id,  access_toke=access,  refresh_toke=refresh, status=True)
     
-    session.add(token_db)
-    session.commit()
-    session.refresh(token_db)
+    db.add(token_db)
+    db.commit()
+    db.refresh(token_db)
    
    
     return {

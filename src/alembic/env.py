@@ -1,9 +1,9 @@
-import sys
 import os
-from logging.config import fileConfig
+import sys
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from alembic import context
+from logging.config import fileConfig
 
 # Add the project root directory to the system path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -24,6 +24,10 @@ if config.config_file_name is not None:
 from database import Base  # Import your Base model
 target_metadata = Base.metadata
 
+# Set the template path
+template_path = os.path.join(os.path.dirname(__file__), 'script.py.mako')
+config.set_main_option('template_path', template_path)
+
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
@@ -35,10 +39,6 @@ def run_migrations_offline() -> None:
     and not an Engine, though an Engine is acceptable
     here as well.  By skipping the Engine creation
     we don't even need a DBAPI to be available.
-
-    Calls to context.execute() here emit the given string to the
-    script output.
-
     """
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
@@ -56,7 +56,6 @@ def run_migrations_online() -> None:
 
     In this scenario we need to create an Engine
     and associate a connection with the context.
-
     """
     connectable = engine_from_config(
         config.get_section(config.config_ini_section),
@@ -66,7 +65,8 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
         )
 
         with context.begin_transaction():

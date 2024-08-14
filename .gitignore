@@ -1,7 +1,7 @@
 venv
 .idea
 .env
-alembic/versions
+src/alembic/versions
 alembic.ini
 alembic_backup
 

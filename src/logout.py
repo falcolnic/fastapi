@@ -7,23 +7,14 @@ from src.auth_bearer import ALGORITHM, JWT_SECRET_KEY, JWTBearer
 from src.utils import verify_password,get_hashed_password
 import src.schemas as schemas
 import src.models as models
-from src.database import Base, engine, SessionLocal
+from src.database import Base, engine, SessionLocal, get_db
 
-
-Base.metadata.create_all(engine)
-def get_session():
-    session = SessionLocal()
-    try:
-        yield session
-    finally:
-        session.close()
-        
         
 router=APIRouter()
 
 
 @router.post('/change-password')
-def change_password(request: schemas.changepassword, db: Session = Depends(get_session)):
+def change_password(request: schemas.changepassword, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.email == request.email).first()
     if user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found")
@@ -40,7 +31,7 @@ def change_password(request: schemas.changepassword, db: Session = Depends(get_s
 
 
 @router.post('/logout')
-def logout(dependencies=Depends(JWTBearer()), db: Session = Depends(get_session)):
+def logout(dependencies=Depends(JWTBearer()), db: Session = Depends(get_db)):
     token=dependencies
     payload = jwt.decode(token, JWT_SECRET_KEY, ALGORITHM)
     user_id = payload['sub']
@@ -64,7 +55,7 @@ def logout(dependencies=Depends(JWTBearer()), db: Session = Depends(get_session)
 
 
 @router.delete('/deleteuser/{id}')
-def delete_user(id:int, db: Session = Depends(get_session)):
+def delete_user(id:int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == id).first()
     if user is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found")
