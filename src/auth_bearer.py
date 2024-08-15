@@ -7,12 +7,16 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 # conf
 import os
 from dotenv import load_dotenv
-load_dotenv('.env')
+load_dotenv('A:\\soloFAST\\src\\.env')
+
 class Envs:
     SECRET_KEY = os.getenv('SECRET_KEY')
     ALGO = os.getenv('ALGO')
     REFRESH_SECRET = os.getenv('REFRESH_SECRET')
     
+    if not SECRET_KEY or not ALGO or not REFRESH_SECRET:
+        raise ValueError("Environment variables SECRET_KEY, ALGO, and REFRESH_SECRET must be set")
+
 ACCESS_TOKEN_EXPIRE_MINUTES = 15  # 15 minutes
 REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 # 1 days
 ALGORITHM = Envs.ALGO
@@ -24,7 +28,8 @@ def decodeJWT(jwtoken: str):
         # Decode and verify the token
         payload = jwt.decode(jwtoken, JWT_SECRET_KEY, ALGORITHM)
         return payload
-    except InvalidTokenError:
+    except InvalidTokenError as e:
+        print(f"Invalid token error: {e}")
         return None
 
 

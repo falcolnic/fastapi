@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Our Platform</h1>
+        <p>Please choose a registration method:</p>
+        <form class="col-lg-3" method="get" action="/v1/google/login">
+            <button class="login-btn" type="submit"><i class="fa-brands fa-google"></i> Login with Google</button>
+        </form>
+        <a href="v1/register" class="button">Register via OTP</a>
+        <h2>Privacy Policy</h2>
+        <p>Read our <a href="/privacy_policy">Privacy Policy</a> to understand how we handle your data.</p>
+    </div>
+</body>
+</html>

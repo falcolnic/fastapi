@@ -15,7 +15,7 @@ class UserCreate(BaseModel):
     
     username: Annotated[str, MinLen(3), MaxLen(40)]
     email: Annotated[EmailStr, MinLen(5), MaxLen(40)]
-    password: Annotated[str, Form()]
+    password: Optional[str]
     
 class UserLogin(BaseModel):
     email: str
